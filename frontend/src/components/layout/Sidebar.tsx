@@ -1,6 +1,7 @@
 import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
+import { routes } from '@/lib/router'
 import { 
   Home, 
   Globe, 
@@ -8,14 +9,13 @@ import {
   MessageSquare, 
   Search, 
   Brain, 
+  Database, 
+  BarChart3, 
+  Users, 
+  Shield, 
   Settings, 
-  X,
-  Database,
-  BarChart3,
-  Users,
-  Shield
+  X 
 } from 'lucide-react'
-import { routes } from '@/lib/router'
 
 interface SidebarProps {
   open: boolean

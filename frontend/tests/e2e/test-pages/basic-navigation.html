@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Explorer - Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .nav a:hover {
+            background-color: #f0f0f0;
+        }
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .mobile-nav {
+            display: none;
+        }
+        .breadcrumbs {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .breadcrumbs span {
+            margin: 0 5px;
+            color: #666;
+        }
+        .breadcrumbs span:not(:last-child)::after {
+            content: " > ";
+        }
+        @media (max-width: 768px) {
+            .nav {
+                display: none;
+            }
+            .mobile-nav {
+                display: block;
+            }
+            .mobile-menu {
+                display: none;
+            }
+            .mobile-menu.open {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>RAG Explorer</h1>
+        </div>
+        
+        <div class="nav">
+            <a href="#" data-page="dashboard">Dashboard</a>
+            <a href="#" data-page="domains">Domains</a>
+            <a href="#" data-page="documents">Documents</a>
+            <a href="#" data-page="search">Search</a>
+            <a href="#" data-page="rag">RAG</a>
+            <a href="#" data-page="chats">Chats</a>
+            <a href="#" data-page="external-models">External Models</a>
+            <a href="#" data-page="settings">Settings</a>
+        </div>
+
+        <div class="mobile-nav">
+            <button id="mobile-menu-button" data-testid="mobile-menu-button">Menu</button>
+            <div id="mobile-menu" class="mobile-menu" data-testid="mobile-menu">
+                <a href="#" data-page="dashboard">Dashboard</a>
+                <a href="#" data-page="domains">Domains</a>
+                <a href="#" data-page="documents">Documents</a>
+                <a href="#" data-page="search">Search</a>
+                <a href="#" data-page="rag">RAG</a>
+                <a href="#" data-page="chats">Chats</a>
+                <a href="#" data-page="external-models">External Models</a>
+                <a href="#" data-page="settings">Settings</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="dashboard" class="page active">
+                <h2>Dashboard</h2>
+                <p>Welcome to the RAG Explorer Dashboard</p>
+            </div>
+
+            <div id="domains" class="page">
+                <h2>Domains</h2>
+                <p>Manage your knowledge domains</p>
+                <button data-testid="create-domain-button">Create Domain</button>
+                <div class="breadcrumbs" data-testid="breadcrumbs">
+                    <span>Dashboard</span>
+                    <span>Domains</span>
+                </div>
+            </div>
+
+            <div id="documents" class="page">
+                <h2>Documents</h2>
+                <p>Manage your documents</p>
+                
+                <div class="upload-section">
+                    <h3>Upload Documents</h3>
+                    <div class="upload-area">
+                        <p>Drag and drop files here</p>
+                        <p class="file-types">Supported formats: PDF, DOCX, TXT, MD</p>
+                    </div>
+                </div>
+                
+                <div class="search-section">
+                    <input type="text" placeholder="Search documents..." class="search-input">
+                    <label for="domain-filter">Filter by domain</label>
+                    <select id="domain-filter" class="domain-filter" aria-label="Filter by domain">
+                        <option>Filter by domain</option>
+                        <option>All domains</option>
+                    </select>
+                </div>
+                
+                <div class="document-list">
+                    <h3>Document List</h3>
+                    <p class="no-documents">No documents uploaded yet</p>
+                </div>
+            </div>
+
+            <div id="search" class="page">
+                <h2>Search</h2>
+                <p>Search through your knowledge base</p>
+            </div>
+
+            <div id="rag" class="page">
+                <h2>RAG</h2>
+                <p>Retrieval-Augmented Generation</p>
+            </div>
+
+            <div id="chats" class="page">
+                <h2>Chats</h2>
+                <p>Chat with your AI assistant</p>
+            </div>
+
+            <div id="external-models" class="page">
+                <h2>External Models</h2>
+                <p>Configure external AI models</p>
+            </div>
+
+            <div id="settings" class="page">
+                <h2>Settings</h2>
+                <p>Configure your application</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple navigation logic
+        document.querySelectorAll('[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = link.getAttribute('data-page');
+                showPage(pageId);
+                
+                // Close mobile menu if open
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('open');
+        });
+
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) {
+                selectedPage.classList.add('active');
+            }
+        }
+
+        // Handle breadcrumb clicks
+        document.querySelectorAll('.breadcrumbs span').forEach(breadcrumb => {
+            breadcrumb.addEventListener('click', () => {
+                if (breadcrumb.textContent === 'Dashboard') {
+                    showPage('dashboard');
+                } else if (breadcrumb.textContent === 'Domains') {
+                    showPage('domains');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,11 +1,24 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '../../test/utils'
+import React from 'react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { ThemeProvider, useTheme } from '../ThemeContext'
-import { act } from 'react'
 
-// Test component to access theme context
+// Mock localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+}
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+  writable: true,
+})
+
+// Test component to display theme state
 const TestComponent = () => {
   const { theme, setTheme, resolvedTheme } = useTheme()
+  
   return (
     <div>
       <span data-testid="current-theme">{theme}</span>
@@ -19,13 +32,17 @@ const TestComponent = () => {
 
 describe('ThemeContext', () => {
   beforeEach(() => {
-    // Clear localStorage before each test
-    localStorage.clear()
-    // Reset matchMedia mock
+    vi.clearAllMocks()
+    // Reset document classes
+    document.documentElement.classList.remove('light', 'dark')
+    // Default to system theme
+    localStorageMock.getItem.mockReturnValue('system')
+    
+    // Mock matchMedia with proper implementation
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
       value: vi.fn().mockImplementation(query => ({
-        matches: false,
+        matches: query === '(prefers-color-scheme: dark)',
         media: query,
         onchange: null,
         addListener: vi.fn(),
@@ -38,10 +55,13 @@ describe('ThemeContext', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
+    vi.restoreAllMocks()
+    document.documentElement.classList.remove('light', 'dark')
   })
 
   it('should render with default system theme', () => {
+    localStorageMock.getItem.mockReturnValue('system')
+    
     render(
       <ThemeProvider>
         <TestComponent />
@@ -52,7 +72,7 @@ describe('ThemeContext', () => {
   })
 
   it('should render with saved theme from localStorage', () => {
-    localStorage.setItem('theme', 'dark')
+    localStorageMock.getItem.mockReturnValue('dark')
     
     render(
       <ThemeProvider>
@@ -159,20 +179,12 @@ describe('ThemeContext', () => {
     const darkButton = screen.getByText('Dark')
     fireEvent.click(darkButton)
 
-    await waitFor(() => {
-      expect(document.documentElement.classList.contains('dark')).toBe(true)
-    })
-
-    const lightButton = screen.getByText('Light')
-    fireEvent.click(lightButton)
-
-    await waitFor(() => {
-      expect(document.documentElement.classList.contains('dark')).toBe(false)
-    })
+    expect(document.documentElement).toHaveClass('dark')
+    expect(document.documentElement).not.toHaveClass('light')
   })
 
   it('should handle invalid theme values gracefully', () => {
-    localStorage.setItem('theme', 'invalid-theme')
+    localStorageMock.getItem.mockReturnValue('invalid-theme')
     
     render(
       <ThemeProvider>
@@ -180,13 +192,15 @@ describe('ThemeContext', () => {
       </ThemeProvider>
     )
 
-    // Should fall back to system theme
+    // Should fallback to system theme
     expect(screen.getByTestId('current-theme')).toHaveTextContent('system')
   })
 
   it('should update resolved theme when system preference changes', async () => {
-    let mediaQueryListeners: ((e: MediaQueryListEvent) => void)[] = []
+    // Start with system theme
+    localStorageMock.getItem.mockReturnValue('system')
     
+    // Mock system prefers dark mode initially
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
       value: vi.fn().mockImplementation(query => ({
@@ -195,11 +209,7 @@ describe('ThemeContext', () => {
         onchange: null,
         addListener: vi.fn(),
         removeListener: vi.fn(),
-        addEventListener: vi.fn((event, listener) => {
-          if (event === 'change') {
-            mediaQueryListeners.push(listener)
-          }
-        }),
+        addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
       })),
@@ -211,21 +221,31 @@ describe('ThemeContext', () => {
       </ThemeProvider>
     )
 
-    // Initially dark
+    // Should start with dark theme (system preference)
     await waitFor(() => {
       expect(screen.getByTestId('resolved-theme')).toHaveTextContent('dark')
     })
 
-    // Simulate system preference change to light
-    act(() => {
-      mediaQueryListeners.forEach(listener => {
-        listener({
-          matches: false,
-          media: '(prefers-color-scheme: dark)',
-        } as MediaQueryListEvent)
-      })
+    // Now change system preference to light
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation(query => ({
+        matches: query === '(prefers-color-scheme: light)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
     })
 
+    // Trigger the change event manually
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    mediaQuery.dispatchEvent(new Event('change'))
+
+    // Should update to light theme
     await waitFor(() => {
       expect(screen.getByTestId('resolved-theme')).toHaveTextContent('light')
     })

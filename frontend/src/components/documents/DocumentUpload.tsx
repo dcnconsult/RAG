@@ -66,10 +66,10 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
     setUploadedFiles(prev => [...prev, ...newFiles])
 
     // Upload each file
-    newFiles.forEach(uploadFile)
+    newFiles.forEach(uploadFileFunction)
   }, [addToast])
 
-  const uploadFile = async (uploadFile: UploadedFile) => {
+  const uploadFileFunction = async (uploadFile: UploadedFile) => {
     try {
       const formData = new FormData()
       formData.append('file', uploadFile.file)
@@ -99,35 +99,37 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
       setUploadedFiles(prev => 
         prev.map(f => 
           f.id === uploadFile.id 
-            ? { ...f, status: 'success', progress: 100 }
+            ? { ...f, status: 'success' as const, progress: 100 }
             : f
         )
       )
 
-      addToast(createToast.success(
-        'Upload successful',
-        `${uploadFile.file.name} has been uploaded successfully`
-      ))
-
-      if (onUploadComplete && response.data?.id) {
+      // Call callback if provided
+      if (onUploadComplete) {
         onUploadComplete(response.data.id)
       }
 
+      // Show success toast
+      addToast(createToast.success(
+        'Upload successful',
+        `${uploadFile.file.name} has been uploaded successfully.`
+      ))
+
     } catch (error: any) {
-      console.error('Upload error:', error)
-      
+      // Update file status to error
       setUploadedFiles(prev => 
         prev.map(f => 
           f.id === uploadFile.id 
             ? { 
                 ...f, 
-                status: 'error', 
+                status: 'error' as const, 
                 error: error.response?.data?.detail || 'Upload failed'
               }
             : f
         )
       )
 
+      // Show error toast
       addToast(createToast.error(
         'Upload failed',
         `${uploadFile.file.name}: ${error.response?.data?.detail || 'Upload failed'}`
@@ -145,11 +147,11 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
       setUploadedFiles(prev => 
         prev.map(f => 
           f.id === fileId 
-            ? { ...f, status: 'uploading', progress: 0, error: undefined }
+            ? { ...f, status: 'uploading' as const, progress: 0, error: undefined }
             : f
         )
       )
-      uploadFile(file)
+      uploadFileFunction(file)
     }
   }
 
@@ -184,6 +186,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
       {/* Drop Zone */}
       <Card 
         {...getRootProps()} 
+        data-testid="dropzone"
         className={cn(
           "border-2 border-dashed transition-all duration-200 cursor-pointer",
           isDragActive && !isDragReject && "border-primary-500 bg-primary-50 dark:bg-primary-900/20",
@@ -192,7 +195,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         )}
       >
         <CardBody className="p-8 text-center">
-          <input {...getInputProps()} ref={fileInputRef} />
+          <input {...getInputProps()} ref={fileInputRef} data-testid="file-input" />
           
           <motion.div
             initial={{ scale: 1 }}
@@ -246,6 +249,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
             {uploadedFiles.map((uploadFile) => (
               <motion.div
                 key={uploadFile.id}
+                data-testid="file-item"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
@@ -285,6 +289,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                       
                       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <motion.div
+                          data-testid="progress-bar"
                           className={cn(
                             "h-2 rounded-full transition-all duration-300",
                             uploadFile.status === 'success' && "bg-green-500",
@@ -297,34 +302,28 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                       </div>
                     </div>
                     
-                    {/* Error Message */}
-                    {uploadFile.error && (
-                      <div className="mt-2 text-xs text-red-600 dark:text-red-400">
-                        {uploadFile.error}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Actions */}
-                  <div className="flex items-center space-x-2">
-                    {uploadFile.status === 'error' && (
+                    {/* Action Buttons */}
+                    <div className="flex items-center space-x-2 mt-3">
+                      {uploadFile.status === 'error' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => uploadFileFunction(uploadFile)}
+                          data-testid="retry-button"
+                        >
+                          Retry
+                        </Button>
+                      )}
+                      
                       <Button
-                        variant="outline"
                         size="sm"
-                        onClick={() => retryUpload(uploadFile.id)}
-                        className="h-8 px-2"
+                        variant="ghost"
+                        onClick={() => removeFile(uploadFile.id)}
+                        data-testid="delete-button"
                       >
-                        Retry
+                        <Trash2 className="h-4 w-4" />
                       </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeFile(uploadFile.id)}
-                      className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    </div>
                   </div>
                 </div>
               </motion.div>

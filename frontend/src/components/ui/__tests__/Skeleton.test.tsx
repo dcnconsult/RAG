@@ -160,13 +160,18 @@ describe('Skeleton Components', () => {
       render(<SkeletonAvatar width="60px" height="60px" />)
       
       const avatar = screen.getByTestId('skeleton-avatar')
-      const skeleton = screen.getByTestId('skeleton')
       
-      // The custom dimensions are applied to the inner Skeleton component
-      expect(skeleton).toHaveStyle({
-        width: '60px',
-        height: '60px'
-      })
+      // The custom dimensions are applied to the outer SkeletonAvatar div
+      // when both width and height are provided
+      const style = avatar.getAttribute('style')
+      expect(style).toContain('width: 60px')
+      expect(style).toContain('height: 60px')
+      
+      // Also check that the inner Skeleton component has the dimensions
+      const skeleton = screen.getByTestId('skeleton')
+      const skeletonStyle = skeleton.getAttribute('style')
+      expect(skeletonStyle).toContain('width: 60px')
+      expect(skeletonStyle).toContain('height: 60px')
     })
 
     it('should apply custom className', () => {
