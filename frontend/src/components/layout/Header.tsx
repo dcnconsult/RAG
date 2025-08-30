@@ -10,7 +10,6 @@ import {
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { MobileNavigation } from '@/components/ui/MobileNavigation'
-import { routes } from '@/lib/router'
 import { cn } from '@/lib/utils'
 
 type HeaderProps = {
@@ -22,15 +21,15 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   const getPageTitle = () => {
     switch (location.pathname) {
-      case routes.home:
+      case '/':
         return 'Dashboard'
-      case routes.domains:
+      case '/domains':
         return 'Domains'
-      case routes.documents:
+      case '/documents':
         return 'Documents'
-      case routes.chat:
+      case '/chat':
         return 'Chat'
-      case routes.settings:
+      case '/settings':
         return 'Settings'
       default:
         return 'RAG Explorer'

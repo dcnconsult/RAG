@@ -27,7 +27,7 @@ import { Input } from '@/components/ui/Input'
 import { api } from '@/lib/api'
 import { queryKeys, mutationKeys } from '@/lib/query-client'
 import { cn } from '@/lib/utils'
-import { routes } from '@/lib/router'
+import { routes } from '@/lib/routes'
 
 // Types
 interface Domain {

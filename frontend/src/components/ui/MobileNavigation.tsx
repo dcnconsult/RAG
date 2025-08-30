@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { Button } from './Button'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { routes } from '@/lib/router'
+import { routes } from '@/lib/routes'
 import { useTheme } from '@/contexts/ThemeContext'
 import { cn } from '@/lib/utils'
 

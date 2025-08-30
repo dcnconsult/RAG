@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Home, ArrowLeft } from 'lucide-react'
-import { routes } from '@/lib/router'
+import { routes } from '@/lib/routes'
 
 export const NotFound: React.FC = () => {
   return (

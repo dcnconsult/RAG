@@ -11,7 +11,7 @@ import {
   ArrowRight
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { routes } from '@/lib/router'
+import { routes } from '@/lib/routes'
 
 export const Dashboard: React.FC = () => {
   const stats = [
