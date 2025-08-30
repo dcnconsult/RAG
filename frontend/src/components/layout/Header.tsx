@@ -13,7 +13,11 @@ import { MobileNavigation } from '@/components/ui/MobileNavigation'
 import { routes } from '@/lib/router'
 import { cn } from '@/lib/utils'
 
-export const Header: React.FC = () => {
+type HeaderProps = {
+  onMenuClick?: () => void
+}
+
+export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const location = useLocation()
 
   const getPageTitle = () => {
@@ -38,6 +42,15 @@ export const Header: React.FC = () => {
       <div className="flex items-center justify-between">
         {/* Left side - Page title and mobile menu */}
         <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="lg:hidden h-9 w-9 p-0"
+            aria-label="Open menu"
+            onClick={onMenuClick}
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
           <MobileNavigation />
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             {getPageTitle()}

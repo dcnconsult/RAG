@@ -36,13 +36,8 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     sourcemap: mode === 'analyze', // Enable sourcemaps only for analysis
-    minify: 'terser', // Use terser for better minification
-    terserOptions: {
-      compress: {
-        drop_console: mode !== 'analyze', // Keep console for analysis mode
-        drop_debugger: true,
-      },
-    },
+    // Disable JS minification to avoid TDZ/runtime issues in MVP build
+    minify: false,
     rollupOptions: {
       output: {
         manualChunks: {

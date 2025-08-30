@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # Single container with PostgreSQL + FastAPI + Frontend
+  rag_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: rag_app_prod
+    restart: unless-stopped
+    ports:
+      - "5432:5432"  # PostgreSQL
+      - "8000:8000"  # FastAPI API
+      - "80:80"      # Frontend (nginx)
+    environment:
+      # Application Configuration
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - PROJECT_NAME=RAG Explorer
+      - VERSION=1.0.0
+      
+      # Security
+      - SECRET_KEY=your-super-secret-key-change-in-production-12345
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      
+      # Database Configuration (internal to container)
+      - DATABASE_URL=postgresql://rag_user:rag_password@localhost:5432/rag_db
+      
+      # Redis Configuration (external)
+      - REDIS_URL=redis://redis:6379
+      
+      # Celery Configuration
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      
+      # Vector Configuration
+      - VECTOR_DIMENSION=1536
+      - CHUNK_SIZE=1000
+      - CHUNK_OVERLAP=200
+      - MAX_TOKENS=4096
+      - TEMPERATURE=0.7
+      
+      # File Upload Configuration
+      - MAX_FILE_SIZE=10485760
+      - UPLOAD_DIR=./uploads
+      - ALLOWED_EXTENSIONS=pdf,docx,txt,md,rtf
+      
+      # Rate Limiting
+      - RATE_LIMIT_PER_MINUTE=60
+      - RATE_LIMIT_PER_HOUR=1000
+      
+      # Logging
+      - LOG_LEVEL=INFO
+      - LOG_FORMAT=json
+      
+      # Monitoring
+      - PROMETHEUS_MULTIPROC_DIR=/tmp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./uploads:/app/uploads
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "rag_user", "-d", "rag_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: rag_redis_prod
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: rag_production_network
+    driver: bridge

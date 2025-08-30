@@ -39,3 +39,8 @@ python run_tests.py --type unit
 - Swagger UI: `/api/v1/docs`
 - ReDoc: `/api/v1/redoc`
 - OpenAPI: `/api/v1/openapi.json`
+- Health: `/api/v1/health`
+
+## Docker (Single Image)
+
+In production, the API runs inside the single image alongside PostgreSQL and Nginx, orchestrated by supervisord. The API is reverse-proxied under `/api/v1`.

@@ -5,7 +5,6 @@ import {
   Upload, 
   FileText, 
   File, 
-  X, 
   CheckCircle, 
   AlertCircle,
   Loader2,
@@ -39,7 +38,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
   className
 }) => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
-  const [isDragActive, setIsDragActive] = useState(false)
+  const [isDragActiveState, setIsDragActiveState] = useState(false)
   const { addToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -77,7 +76,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         formData.append('domain_id', domainId)
       }
 
-      const response = await api.post('/documents/upload', formData, {
+      const response = await api.post<{ id: string }>('/documents/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -106,7 +105,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
 
       // Call callback if provided
       if (onUploadComplete) {
-        onUploadComplete(response.data.id)
+        onUploadComplete(response.id)
       }
 
       // Show success toast
@@ -155,7 +154,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
     }
   }
 
-  const { getRootProps, getInputProps, isDragReject } = useDropzone({
+  const { getRootProps, getInputProps, isDragReject, isDragActive } = useDropzone({
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],

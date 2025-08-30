@@ -1,0 +1,89 @@
+# Use Python 3.11 slim image as base
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies including PostgreSQL
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        postgresql-client \
+        postgresql-15 \
+        postgresql-15-pgvector \
+        build-essential \
+        curl \
+        libpq-dev \
+        gcc \
+        g++ \
+        libffi-dev \
+        libssl-dev \
+        pkg-config \
+        git \
+        supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install poetry==1.7.1
+
+# Set work directory
+WORKDIR /app
+
+# Copy poetry files
+COPY pyproject.toml poetry.lock* ./
+
+# Configure poetry to not create virtual environment
+RUN poetry config virtualenvs.create false
+
+# Install Python dependencies (excluding dev dependencies)
+RUN poetry install --only=main
+
+# Copy application code
+COPY . .
+
+# Create uploads directory
+RUN mkdir -p uploads && chmod 755 uploads
+
+# Create non-root user for FastAPI app
+RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
+
+# Copy supervisor configuration
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+# Start PostgreSQL service\n\
+service postgresql start\n\
+\n\
+# Wait for PostgreSQL to be ready\n\
+until pg_isready -U postgres; do\n\
+  echo "Waiting for PostgreSQL..."\n\
+  sleep 2\n\
+done\n\
+\n\
+# Create database and user if they don\'t exist\n\
+psql -U postgres -c "CREATE DATABASE rag_db;" 2>/dev/null || true\n\
+psql -U postgres -c "CREATE USER rag_user WITH PASSWORD '\''rag_password'\'';" 2>/dev/null || true\n\
+psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE rag_db TO rag_user;" 2>/dev/null || true\n\
+psql -U postgres -d rag_db -c "CREATE EXTENSION IF NOT EXISTS vector;" 2>/dev/null || true\n\
+\n\
+# Start FastAPI application\n\
+cd /app\n\
+poetry run uvicorn main:app --host 0.0.0.0 --port 8000 &\n\
+\n\
+# Wait for all background processes\n\
+wait\n\
+' > /start.sh && chmod +x /start.sh
+
+# Expose ports
+EXPOSE 5432 8000
+
+# Health check for PostgreSQL
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD pg_isready -U postgres || exit 1
+
+# Use the startup script
+CMD ["/start.sh"]

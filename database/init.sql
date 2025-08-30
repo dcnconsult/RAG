@@ -1,8 +1,9 @@
 -- RAG Explorer Database Initialization Script
 -- This script sets up the initial database structure for the RAG application
 
--- Enable the pgvector extension for vector operations
+-- Enable extensions
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- Create custom types
 CREATE TYPE document_status AS ENUM ('pending', 'processing', 'completed', 'failed');

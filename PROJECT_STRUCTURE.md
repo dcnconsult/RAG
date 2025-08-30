@@ -76,8 +76,9 @@ RAG/
 - `package.json`: Dependencies, scripts, and project metadata
 
 ### Infrastructure Configuration
-- `docker-compose.yml`: Multi-service container orchestration
-- `database/init.sql`: Database schema, tables, and initial data
+- `docker-compose.yml`: Orchestration for dev; `docker-compose.prod.yml` for production
+- `Dockerfile.prod`: Single-image production build (pgvector + FastAPI + Nginx via supervisord)
+- `database/init.sql`: Database schema, extensions, and initial data
 
 ## 🚀 Development Workflow
 
