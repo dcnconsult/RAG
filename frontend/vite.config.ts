@@ -80,15 +80,15 @@ export default defineConfig(({ mode }) => ({
   esbuild: {
     target: 'es2020', // Target modern browsers for better performance
   },
-  // CSS optimizations - temporarily disabled for E2E testing
-  // css: {
-  //   postcss: {
-  //     plugins: [
-  //       autoprefixer,
-  //       tailwindcss,
-  //     ],
-  //   },
-  // },
+  // Enable PostCSS (Tailwind + Autoprefixer) for production CSS
+  css: {
+    postcss: {
+      plugins: [
+        autoprefixer,
+        tailwindcss,
+      ],
+    },
+  },
   // Preview server for testing production build
   preview: {
     port: 4173,
