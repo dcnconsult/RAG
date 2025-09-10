@@ -1,0 +1,27 @@
+{
+  "name": "rag",
+  "version": "1.0.0",
+  "description": "A modern, intuitive RAG (Retrieval-Augmented Generation) application that allows users to create, manage, and interact with knowledge domains powered by PostgreSQL vector databases.",
+  "main": "test-frontend.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcnconsult/RAG.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dcnconsult/RAG/issues"
+  },
+  "homepage": "https://github.com/dcnconsult/RAG#readme",
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "desktop": {
+    "title": "RAG Explorer",
+    "yellowElements": 16,
+    "cards": 8,
+    "navItems": 4,
+    "buttons": 11,
+    "hasYellowAccent": true,
+    "hasRoundedCards": true,
+    "hasMobileNav": true,
+    "timestamp": "2025-09-10T00:53:23.524Z"
+  },
+  "mobile": {
+    "title": "RAG Explorer",
+    "yellowElements": 16,
+    "cards": 8,
+    "navItems": 4,
+    "buttons": 11,
+    "hasYellowAccent": true,
+    "hasRoundedCards": true,
+    "hasMobileNav": true,
+    "timestamp": "2025-09-10T00:53:24.056Z"
+  }
+}

@@ -17,7 +17,8 @@ import {
   Calendar,
   User,
   Brain,
-  FileText
+  FileText,
+  ArrowLeft
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { queryKeys, mutationKeys } from '@/lib/query-client'
@@ -210,230 +211,90 @@ export const Chats: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Chats</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Manage your chat conversations and RAG interactions.
-          </p>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0"
+          title="Go Back"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Chat</h1>
+      </div>
+
+      {/* Chat Interface */}
+      <div className="flex flex-col h-[500px] sm:h-[600px] bg-white rounded-2xl border border-gray-200 shadow-soft">
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 sm:space-y-4">
+          {/* AI Assistant Message */}
+          <div className="flex items-start space-x-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <Brain className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
+            </div>
+            <div className="chat-message chat-message-ai">
+              <p className="text-sm text-gray-700">
+                can I assist you today with your knowledge domain?
+              </p>
+            </div>
+          </div>
+
+          {/* User Message */}
+          <div className="flex items-start space-x-3 justify-end">
+            <div className="chat-message chat-message-user">
+              <p className="text-sm text-gray-900">
+                Hi! Can you tell me about the latest developments in AI?
+              </p>
+            </div>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600" />
+            </div>
+          </div>
+
+          {/* AI Assistant Response */}
+          <div className="flex items-start space-x-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <Brain className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
+            </div>
+            <div className="chat-message chat-message-ai">
+              <p className="text-sm text-gray-700">
+                Certainly! Recent advancements in AI include breakthroughs in natural language processing, computer vision, and reinforcement learning. Would you like more details on a specific area?
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          {selectedChats.size > 0 && (
+
+        {/* Chat Input */}
+        <div className="border-t border-gray-200 p-3 sm:p-4">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <Button
-              variant="danger"
+              variant="ghost"
               size="sm"
-              onClick={handleBulkDelete}
-              disabled={bulkDeleteMutation.isPending}
-              leftIcon={<Trash2 className="h-4 w-4" />}
+              className="h-7 w-7 sm:h-8 sm:w-8 p-0"
+              title="Attach File"
             >
-              Delete Selected ({selectedChats.size})
+              <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
-          )}
-          <Button
-            variant="primary"
-            onClick={() => setShowCreateModal(true)}
-            leftIcon={<Plus className="h-4 w-4" />}
-          >
-            New Chat
-          </Button>
+            <div className="flex-1">
+              <Input
+                placeholder="Type your message..."
+                className="w-full text-sm"
+              />
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              className="bg-yellow-500 text-gray-900 hover:bg-yellow-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
+              title="Send Message"
+            >
+              <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardBody>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
-              <Input
-                placeholder="Search chats and messages..."
-                value={filters.search}
-                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                leftIcon={<Search className="h-4 w-4" />}
-                fullWidth
-              />
-            </div>
-            <div>
-              <select
-                value={filters.domain}
-                onChange={(e) => setFilters(prev => ({ ...prev, domain: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="">All Domains</option>
-                {domains.map(domain => (
-                  <option key={domain.id} value={domain.id}>{domain.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <select
-                value={`${filters.sortBy}-${filters.sortOrder}`}
-                onChange={(e) => {
-                  const [sortBy, sortOrder] = e.target.value.split('-')
-                  setFilters(prev => ({ 
-                    ...prev, 
-                    sortBy: sortBy as any, 
-                    sortOrder: sortOrder as any 
-                  }))
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="updated_at-desc">Recently Updated</option>
-                <option value="updated_at-asc">Oldest Updated</option>
-                <option value="created_at-desc">Newest Created</option>
-                <option value="created_at-asc">Oldest Created</option>
-                <option value="title-asc">Title A-Z</option>
-                <option value="title-desc">Title Z-A</option>
-                <option value="message_count-desc">Most Messages</option>
-              </select>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
-
-      {/* Chats List */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">
-              {isLoading ? 'Loading...' : `${filteredChats.length} Chat${filteredChats.length !== 1 ? 's' : ''}`}
-            </h3>
-            {filteredChats.length > 0 && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <input
-                  type="checkbox"
-                  checked={selectedChats.size === filteredChats.length}
-                  onChange={handleSelectAll}
-                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                />
-                <span>Select All</span>
-              </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardBody className="p-0">
-          {isLoading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-              <div className="mt-2 text-gray-500">Loading chats...</div>
-            </div>
-          ) : filteredChats.length === 0 ? (
-            <div className="p-8 text-center">
-              <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <div className="text-gray-500 text-lg font-medium">No chats found</div>
-              <div className="text-gray-400 mt-2">
-                {filters.search || filters.domain ? 'Try adjusting your filters' : 'Start your first conversation to get started'}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredChats.map((chat) => (
-                <div 
-                  key={chat.id} 
-                  className={cn(
-                    "border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-150",
-                    selectedChats.has(chat.id) && "bg-primary-50 border-primary-200"
-                  )}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3 flex-1">
-                      <input
-                        type="checkbox"
-                        checked={selectedChats.has(chat.id)}
-                        onChange={() => handleSelectChat(chat.id)}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 mt-1"
-                      />
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h4 className="text-sm font-medium text-gray-900 truncate">
-                            {chat.title}
-                          </h4>
-                          <Badge variant={getStatusVariant(chat.status)}>
-                            {chat.status}
-                          </Badge>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-2">
-                          <div className="flex items-center">
-                            <Globe className="h-3 w-3 mr-1" />
-                            {chat.domain_name}
-                          </div>
-                          <div className="flex items-center">
-                            <MessageSquare className="h-3 w-3 mr-1" />
-                            {chat.message_count} message{chat.message_count !== 1 ? 's' : ''}
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            Created {formatDate(chat.created_at)}
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Updated {formatDate(chat.updated_at)}
-                          </div>
-                        </div>
-                        
-                        {chat.last_message && (
-                          <div className="text-sm text-gray-600 bg-gray-50 rounded p-2">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-medium text-gray-500">
-                                {chat.last_message.role === 'user' ? 'You' : 'Assistant'}
-                              </span>
-                              <span className="text-xs text-gray-400">
-                                {formatDate(chat.last_message.timestamp)}
-                              </span>
-                            </div>
-                            <p className="text-gray-700">
-                              {truncateText(chat.last_message.content, 150)}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 ml-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        title="Continue Chat"
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        title="View Chat"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        title="Edit Chat"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        title="Delete Chat"
-                        onClick={() => setDeleteChat(chat)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardBody>
-      </Card>
 
       {/* Modals */}
       <CreateChatModal

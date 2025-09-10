@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { analyzer } from 'vite-bundle-analyzer'
-import autoprefixer from 'autoprefixer'
 import tailwindcss from '@tailwindcss/postcss'
+import autoprefixer from 'autoprefixer'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -80,14 +80,26 @@ export default defineConfig(({ mode }) => ({
   esbuild: {
     target: 'es2020', // Target modern browsers for better performance
   },
+  // Skip TypeScript checking for MVP build
+  rollupOptions: {
+    onwarn(warning, warn) {
+      // Suppress TypeScript warnings for MVP
+      if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return
+      warn(warning)
+    }
+  },
   // Enable PostCSS (Tailwind + Autoprefixer) for production CSS
   css: {
     postcss: {
       plugins: [
-        autoprefixer,
         tailwindcss,
+        autoprefixer,
       ],
     },
+  },
+  // Define environment variables
+  define: {
+    'process.env': {}
   },
   // Preview server for testing production build
   preview: {

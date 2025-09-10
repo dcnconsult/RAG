@@ -1,64 +1,79 @@
 @echo off
-setlocal enabledelayedexpansion
+REM RAG Explorer Production Deployment Script for Windows
+REM This script builds and deploys the RAG application in production mode
 
-echo 🚀 Starting RAG Explorer Production Deployment...
+echo ========================================
+echo RAG Explorer Production Deployment
+echo ========================================
+echo.
 
 REM Check if Docker is running
-docker info >nul 2>&1
-if errorlevel 1 (
-    echo ❌ Docker is not running. Please start Docker and try again.
+echo Checking Docker status...
+docker version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ERROR: Docker is not running or not installed.
+    echo Please start Docker Desktop and try again.
     pause
     exit /b 1
 )
+echo Docker is running ✓
+echo.
 
-REM Create necessary directories
-echo 📁 Creating necessary directories...
-if not exist "uploads" mkdir uploads
-if not exist "logs" mkdir logs
-if not exist "database" mkdir database
+REM Check if we're in the right directory
+if not exist "Dockerfile.prod" (
+    echo ERROR: Dockerfile.prod not found.
+    echo Please run this script from the project root directory.
+    pause
+    exit /b 1
+)
+echo Project structure verified ✓
+echo.
 
-REM Set environment variables
-set POSTGRES_PASSWORD=rag_password
-set POSTGRES_USER=rag_user
-set POSTGRES_DB=rag_db
-
-echo 🔧 Environment variables set:
-echo    POSTGRES_PASSWORD: %POSTGRES_PASSWORD%
-echo    POSTGRES_USER: %POSTGRES_USER%
-echo    POSTGRES_DB: %POSTGRES_DB%
+REM Stop any existing containers
+echo Stopping existing containers...
+docker-compose down 2>nul
+echo.
 
 REM Build and start the application
-echo 🏗️  Building and starting RAG Explorer...
-docker-compose -f docker-compose.prod.yml up --build -d
+echo Building and starting RAG Explorer...
+docker-compose up --build -d
 
-REM Wait for services to be ready
-echo ⏳ Waiting for services to be ready...
-timeout /t 30 /nobreak >nul
-
-REM Check health
-echo 🏥 Checking service health...
-docker-compose -f docker-compose.prod.yml ps | findstr "Up" >nul
-if errorlevel 1 (
-    echo ❌ Some services failed to start. Check logs:
-    docker-compose -f docker-compose.prod.yml logs
+if %errorlevel% neq 0 (
+    echo ERROR: Build or deployment failed!
+    echo Check the error messages above.
     pause
     exit /b 1
-) else (
-    echo ✅ RAG Explorer is running successfully!
-    echo.
-    echo 🌐 Access URLs:
-echo    Frontend: http://localhost:3000
-echo    Backend API: http://localhost:8000
-echo    PostgreSQL: localhost:5432
-echo    Redis: localhost:6379
-echo.
-echo 📊 To view logs: docker-compose -f docker-compose.prod.yml logs -f
-echo 🛑 To stop: docker-compose -f docker-compose.prod.yml down
-echo.
-echo 🔍 To check specific service logs:
-echo    Backend: docker-compose -f docker-compose.prod.yml logs -f backend
-echo    PostgreSQL: docker-compose -f docker-compose.prod.yml logs -f postgres
-echo    Redis: docker-compose -f docker-compose.prod.yml logs -f redis
 )
 
-pause
+echo.
+echo ========================================
+echo Deployment Complete!
+echo ========================================
+echo.
+echo Application URLs:
+echo - Frontend: http://localhost
+echo - API: http://localhost:8000
+echo - Database: localhost:5432
+echo.
+echo To check status: docker-compose ps
+echo To view logs: docker-compose logs -f
+echo To stop: docker-compose down
+echo.
+
+REM Wait a moment for services to start
+echo Waiting for services to start...
+timeout /t 10 /nobreak >nul
+
+REM Test the application
+echo Testing application...
+curl -s http://localhost/api/v1/health >nul 2>&1
+if %errorlevel% equ 0 (
+    echo ✓ Application is running successfully!
+) else (
+    echo ⚠ Application may still be starting up...
+    echo Check http://localhost in your browser
+)
+
+echo.
+echo Press any key to exit...
+pause >nul

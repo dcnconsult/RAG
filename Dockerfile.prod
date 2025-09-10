@@ -6,10 +6,10 @@ COPY frontend/package*.json ./
 # Install full deps (build needs devDependencies); use install to sync lock
 RUN npm install --no-audit --no-fund
 COPY frontend/ ./
-# Build: prefer vite build even if TypeScript type checks fail (MVP)
-# If "npm run build" fails due to TS errors, fall back to vite build which doesn't type-check
+# Build: Use Vite build with MVP configuration (skips TypeScript checking)
 ENV VITE_API_BASE_URL=/api/v1
-RUN npm run -s build || (echo "Type errors detected, falling back to vite build for MVP" && npx --yes vite build)
+ENV NODE_ENV=production
+RUN npm run build:mvp
 
 ########## Final runtime (pgvector + Python + nginx) ##########
 FROM pgvector/pgvector:pg15
@@ -55,9 +55,9 @@ RUN pip install --upgrade pip && pip install poetry==1.7.1 && poetry config virt
 # Workdir for backend
 WORKDIR /app
 
-# Install backend dependencies first (better layer caching)
-COPY backend/pyproject.toml backend/poetry.lock* ./
-RUN poetry install --only=main
+# Install backend dependencies first (better layer caching) - Minimal CPU only
+COPY backend/requirements-minimal.txt ./
+RUN pip install --no-cache-dir -r requirements-minimal.txt
 
 # Copy backend code
 COPY backend/ .

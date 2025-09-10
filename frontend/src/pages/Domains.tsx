@@ -186,14 +186,23 @@ export const Domains: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Domains</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Manage your knowledge domains and organize your content.
-          </p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Domain Management</h1>
+          <div className="flex items-center gap-2 mt-2">
+            <h2 className="text-base sm:text-lg font-medium text-gray-700">Domains</h2>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setShowCreateModal(true)}
+              leftIcon={<Plus className="h-4 w-4" />}
+              className="bg-yellow-500 text-gray-900 hover:bg-yellow-600"
+            >
+              Add
+            </Button>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           {selectedDomains.size > 0 && (
@@ -207,13 +216,6 @@ export const Domains: React.FC = () => {
               Delete Selected ({selectedDomains.size})
             </Button>
           )}
-          <Button
-            variant="primary"
-            onClick={() => setShowCreateModal(true)}
-            leftIcon={<Plus className="h-4 w-4" />}
-          >
-            Create Domain
-          </Button>
         </div>
       </div>
 
@@ -267,148 +269,93 @@ export const Domains: React.FC = () => {
         </CardBody>
       </Card>
 
-      {/* Domains List */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">
-              {isLoading ? 'Loading...' : `${filteredDomains.length} Domain${filteredDomains.length !== 1 ? 's' : ''}`}
-            </h3>
-            {filteredDomains.length > 0 && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <input
-                  type="checkbox"
-                  checked={selectedDomains.size === filteredDomains.length}
-                  onChange={handleSelectAll}
-                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                />
-                <span>Select All</span>
-              </div>
-            )}
+      {/* My Domains Section */}
+      <div className="space-y-3 sm:space-y-4">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900">My Domains</h3>
+        
+        {isLoading ? (
+          <div className="grid-mobile">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardBody className="p-4 sm:p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-lg"></div>
+                    <div className="flex-1">
+                      <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-2 sm:h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
           </div>
-        </CardHeader>
-        <CardBody className="p-0">
-          {isLoading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-              <div className="mt-2 text-gray-500">Loading domains...</div>
+        ) : filteredDomains.length === 0 ? (
+          <div className="text-center py-8 sm:py-12">
+            <Globe className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-4" />
+            <div className="text-gray-500 text-base sm:text-lg font-medium">No domains found</div>
+            <div className="text-gray-400 mt-2 text-sm">
+              {filters.search || filters.status ? 'Try adjusting your filters' : 'Create your first domain to get started'}
             </div>
-          ) : filteredDomains.length === 0 ? (
-            <div className="p-8 text-center">
-              <Globe className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <div className="text-gray-500 text-lg font-medium">No domains found</div>
-              <div className="text-gray-400 mt-2">
-                {filters.search || filters.status ? 'Try adjusting your filters' : 'Create your first domain to get started'}
-              </div>
-            </div>
-          ) : (
-            <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Domain
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Documents
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Chats
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredDomains.map((domain) => (
-                    <tr 
-                      key={domain.id} 
-                      className={cn(
-                        "hover:bg-gray-50 transition-colors duration-150",
-                        selectedDomains.has(domain.id) && "bg-primary-50"
-                      )}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedDomains.has(domain.id)}
-                            onChange={() => handleSelectDomain(domain.id)}
-                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 mr-3"
-                          />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{domain.name}</div>
-                            <div className="text-sm text-gray-500">{domain.description}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <FileText className="h-4 w-4 text-gray-400 mr-2" />
-                          {domain.document_count}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm text-gray-900">
-                          <MessageSquare className="h-4 w-4 text-gray-400 mr-2" />
-                          {domain.chat_count}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge variant={getStatusVariant(domain.status)}>
-                          {domain.status}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 text-gray-400 mr-2" />
-                          {formatDate(domain.created_at)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            title="View Domain"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            title="Edit Domain"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            title="Delete Domain"
-                            onClick={() => setDeleteDomain(domain)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardBody>
-      </Card>
+          </div>
+        ) : (
+          <div className="grid-mobile">
+            {filteredDomains.map((domain) => (
+              <Card 
+                key={domain.id} 
+                className={cn(
+                  "hover:shadow-medium transition-all duration-200 cursor-pointer",
+                  selectedDomains.has(domain.id) && "ring-2 ring-yellow-500 bg-yellow-50"
+                )}
+                onClick={() => handleSelectDomain(domain.id)}
+              >
+                <CardBody className="p-4 sm:p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-3 flex-1">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium text-gray-900 truncate">{domain.name}</h4>
+                        <p className="text-xs text-gray-500 mt-1">Last updated {formatDate(domain.updated_at)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0"
+                        title="View Domain"
+                      >
+                        <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0"
+                        title="Edit Domain"
+                      >
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        title="Delete Domain"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDeleteDomain(domain)
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Modals */}
       <CreateDomainModal

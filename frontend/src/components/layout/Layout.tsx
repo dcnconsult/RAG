@@ -2,6 +2,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { BottomNavigation } from './BottomNavigation'
 
 export const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
@@ -20,17 +21,20 @@ export const Layout: React.FC = () => {
       <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
       
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-64 mobile-nav-spacing">
         {/* Header */}
         <Header onMenuClick={() => setSidebarOpen(true)} />
         
         {/* Page content */}
-        <main className="py-6">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <main className="py-4 sm:py-6">
+          <div className="container">
             <Outlet />
           </div>
         </main>
       </div>
+
+      {/* Bottom Navigation - Mobile only */}
+      <BottomNavigation />
     </div>
   )
 }

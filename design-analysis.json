@@ -1,0 +1,16 @@
+{
+  "yellowElements": 8,
+  "cards": 62,
+  "buttons": 11,
+  "headings": 6,
+  "welcomeSection": false,
+  "mainCard": false,
+  "statsGrid": 4,
+  "quickActions": true,
+  "titleSize": "24px",
+  "subtitleSize": "20px",
+  "viewport": {
+    "width": 375,
+    "height": 667
+  }
+}

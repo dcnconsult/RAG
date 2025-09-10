@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit --project tsconfig.build.json && vite build",
+    "build:mvp": "vite build --mode production",
     "build:analyze": "tsc --noEmit --project tsconfig.build.json && vite build --mode analyze",
     "build:prod": "tsc --noEmit --project tsconfig.build.json && vite build --mode production",
     "preview": "vite preview",

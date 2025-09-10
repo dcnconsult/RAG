@@ -8,7 +8,9 @@ import {
   MessageSquare, 
   Brain, 
   Plus,
-  ArrowRight
+  ArrowRight,
+  User,
+  BarChart3
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { routes } from '@/lib/routes'
@@ -117,42 +119,63 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
-      <div className="sm:flex sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Welcome back! Here's what's happening with your RAG system.
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0">
-          <Button leftIcon={<Plus className="h-4 w-4" />}>
-            Quick Action
-          </Button>
-        </div>
+      {/* Welcome Section */}
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          Welcome to RAG Explorer
+        </h1>
+        
+        {/* Main Card */}
+        <Card className="max-w-2xl mx-auto bg-white shadow-lg border border-gray-200">
+          <CardBody className="p-8 text-center space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              RAG Explorer
+            </h2>
+            <p className="text-base text-gray-600 leading-relaxed">
+              Manage your knowledge domains, upload documents, and interact with intelligent retrieval and chat interfaces.
+            </p>
+            
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-6 py-3 rounded-xl shadow-md"
+              >
+                Get Started
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-semibold px-6 py-3 rounded-xl"
+              >
+                Learn More
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.name} className="hover:shadow-medium transition-shadow duration-200">
-            <CardBody className="p-6">
-              <div className="flex items-center">
-                <div className={`flex-shrink-0 ${stat.bgColor} p-3 rounded-lg`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
-                <div className="ml-4 flex-1">
-                  <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                  <div className="flex items-baseline">
-                    <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, index) => (
+          <Card key={stat.name} className={`${index === 0 ? 'ring-2 ring-yellow-500 bg-gradient-to-br from-yellow-50 to-yellow-100 shadow-md' : 'bg-white shadow-sm border border-gray-200'}`}>
+            <CardBody className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600 mb-1">{stat.name}</p>
+                  <div className="flex items-baseline space-x-2">
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                     <Badge 
                       variant={stat.changeType === 'increase' ? 'success' : 'error'}
                       size="sm"
-                      className="ml-2"
+                      className="text-xs"
                     >
                       {stat.change}
                     </Badge>
                   </div>
+                </div>
+                <div className={`flex-shrink-0 ${index === 0 ? 'bg-yellow-500' : stat.bgColor} p-2 rounded-lg shadow-sm`}>
+                  <stat.icon className={`h-5 w-5 ${index === 0 ? 'text-white' : stat.color}`} />
                 </div>
               </div>
             </CardBody>
@@ -161,44 +184,44 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Main content grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
+        <Card className="bg-white shadow-sm border border-gray-200">
+          <CardHeader className="pb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
             <p className="text-sm text-gray-500">Get started with common tasks</p>
           </CardHeader>
           <CardBody className="space-y-3">
-            {quickActions.map((action) => (
+            {quickActions.map((action, index) => (
               <Link
                 key={action.name}
                 to={action.href}
-                className="flex items-center p-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors duration-200"
+                className={`flex items-center p-3 rounded-xl border hover:shadow-md transition-all duration-200 ${index === 0 ? 'ring-2 ring-yellow-500 bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200' : 'border-gray-200 hover:border-gray-300'}`}
               >
-                <div className={`flex-shrink-0 ${action.color} p-2 rounded-lg`}>
-                  <action.icon className="h-5 w-5 text-white" />
+                <div className={`flex-shrink-0 ${index === 0 ? 'bg-yellow-500' : action.color} p-2 rounded-lg shadow-sm`}>
+                  <action.icon className="h-4 w-4 text-white" />
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-medium text-gray-900">{action.name}</p>
                   <p className="text-xs text-gray-500">{action.description}</p>
                 </div>
-                <ArrowRight className="h-4 w-4 text-gray-400" />
+                <ArrowRight className={`h-4 w-4 ${index === 0 ? 'text-yellow-600' : 'text-gray-400'}`} />
               </Link>
             ))}
           </CardBody>
         </Card>
 
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
+        <Card className="bg-white shadow-sm border border-gray-200">
+          <CardHeader className="pb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
             <p className="text-sm text-gray-500">Latest updates from your system</p>
           </CardHeader>
           <CardBody className="space-y-3">
             {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
+              <div key={activity.id} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <div className="flex-shrink-0 mt-1">
+                  <div className={`w-2 h-2 rounded-full ${activity.status === 'completed' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-900">{activity.message}</p>
@@ -207,14 +230,15 @@ export const Dashboard: React.FC = () => {
                 <Badge 
                   variant={activity.status === 'completed' ? 'success' : 'primary'}
                   size="sm"
+                  className="text-xs"
                 >
                   {activity.status}
                 </Badge>
               </div>
             ))}
           </CardBody>
-          <CardFooter>
-            <Button variant="ghost" size="sm" className="w-full">
+          <CardFooter className="pt-3">
+            <Button variant="ghost" size="sm" className="w-full text-sm hover:bg-gray-100">
               View all activity
             </Button>
           </CardFooter>
@@ -222,27 +246,27 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* System Health */}
-      <Card>
-        <CardHeader>
-          <h3 className="text-lg font-medium text-gray-900">System Health</h3>
+      <Card className="bg-white shadow-sm border border-gray-200">
+        <CardHeader className="pb-4">
+          <h3 className="text-lg font-semibold text-gray-900">System Health</h3>
           <p className="text-sm text-gray-500">Current status of your RAG infrastructure</p>
         </CardHeader>
         <CardBody>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="flex items-center space-x-3">
-              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-              <span className="text-sm text-gray-700">Database</span>
-              <Badge variant="success" size="sm">Healthy</Badge>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-200">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm text-gray-700 font-medium">Database</span>
+              <Badge variant="success" size="sm" className="text-xs">Healthy</Badge>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-              <span className="text-sm text-gray-700">Vector Store</span>
-              <Badge variant="success" size="sm">Healthy</Badge>
+            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-200">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm text-gray-700 font-medium">Vector Store</span>
+              <Badge variant="success" size="sm" className="text-xs">Healthy</Badge>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-              <span className="text-sm text-gray-700">External APIs</span>
-              <Badge variant="success" size="sm">Healthy</Badge>
+            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-200">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm text-gray-700 font-medium">External APIs</span>
+              <Badge variant="success" size="sm" className="text-xs">Healthy</Badge>
             </div>
           </div>
         </CardBody>

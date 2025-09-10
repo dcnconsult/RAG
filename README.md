@@ -51,19 +51,39 @@ RAG Explorer/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.11+
-- Node.js 18+ (22+ recommended for E2E testing)
-- PostgreSQL 15+ with pgvector extension
-- Docker & Docker Compose (recommended for production)
+- **Docker Desktop for Windows** (latest version)
+- **Windows 10/11** with WSL2 enabled
+- **8GB+ RAM** (recommended for smooth operation)
+- **10GB+ free disk space**
 
-### 1. Clone & Setup
+### Production Deployment (Single Container)
+
+The RAG Explorer is designed to run as a **single Docker container** containing:
+- PostgreSQL 15 with pgvector extension
+- FastAPI backend (Python 3.11)
+- React frontend (built and served by Nginx)
+- Supervisord for process orchestration
+
+#### Windows Deployment
 ```bash
-git clone <repository-url>
-cd RAG
+# Run the deployment script
+.\deploy.bat
+
+# Or manually:
+docker-compose up --build -d
 ```
 
-### 2. Development Setup (Recommended)
+#### Access the Application
+- **Frontend**: http://localhost (Main access point)
+- **API**: http://localhost:8000
+- **Database**: localhost:5432
+
+### Development Setup
 ```bash
+# Clone the repository
+git clone <repository-url>
+cd RAG
+
 # Start all services with Docker
 docker-compose up -d
 
@@ -72,7 +92,7 @@ docker-compose up -d
 # PostgreSQL will be available at localhost:5432
 ```
 
-### 3. Manual Development Setup
+### Manual Development Setup
 ```bash
 # Backend Setup
 cd backend
@@ -88,42 +108,7 @@ npm install
 npm run dev
 ```
 
-### 4. Production Deployment
-```bash
-# Windows
-deploy.bat
 
-# Linux/Mac
-chmod +x deploy.sh
-./deploy.sh
-
-# Or manually
-docker-compose -f docker-compose.prod.yml up --build -d
-```
-
-### 4.1 Single-Image (Docker Desktop on Windows)
-
-This project ships a single container image that bundles PostgreSQL (with pgvector), FastAPI, and Nginx serving the built frontend. Process orchestration is handled by supervisord.
-
-Build and run:
-
-```powershell
-cd 'C:\Users\novot\DCN Python\RAG'
-docker build -f Dockerfile.prod -t rag-backend:latest .
-docker compose -f docker-compose.prod.yml up -d --build
-```
-
-Endpoints:
-
-- Frontend: `http://localhost/`
-- API health: `http://localhost:8000/api/v1/health`
-- API docs: `http://localhost:8000/api/v1/docs`
-
-Notes:
-
-- Frontend is built with Vite and served by Nginx. The app targets the API via `/api/v1`.
-- Database initialization (including `pgvector` and `pgcrypto`) runs once via `database/init.sql`.
-- Heavy ML dependencies (e.g., torch/transformers) make the first build slow; subsequent builds are faster due to layer caching.
 
 ## 📖 Usage
 
