@@ -10,17 +10,13 @@ import {
   MessageSquare, 
   Settings, 
   Activity,
-  Calendar,
-  Clock,
-  Users,
-  Database,
   BarChart3,
   Plus,
   Upload,
   Search,
   Brain
 } from 'lucide-react'
-import { Card, CardHeader, CardBody, CardFooter } from '@/components/ui/Card'
+import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Input } from '@/components/ui/Input'

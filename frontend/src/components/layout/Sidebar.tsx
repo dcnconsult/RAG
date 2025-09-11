@@ -50,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           {/* Logo and close button */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200">
             <div className="flex items-center">
-              <div className="h-8 w-8 bg-gradient-to-br from-primary-500 to-accent-600 rounded-lg flex items-center justify-center">
+              <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                 <Brain className="h-5 w-5 text-white" />
               </div>
               <span className="ml-3 text-xl font-bold text-gray-900">RAG Explorer</span>
@@ -77,14 +77,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                   className={cn(
                     'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200',
                     isActive
-                      ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600'
+                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                   )}
                 >
                   <item.icon
                     className={cn(
                       'mr-3 h-5 w-5 flex-shrink-0 transition-colors duration-200',
-                      isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'
+                      isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
                     )}
                   />
                   {item.name}
@@ -108,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           {/* Logo */}
           <div className="flex h-16 items-center px-6 border-b border-gray-200">
             <div className="flex items-center">
-              <div className="h-8 w-8 bg-gradient-to-br from-primary-500 to-accent-600 rounded-lg flex items-center justify-center">
+              <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                 <Brain className="h-5 w-5 text-white" />
               </div>
               <span className="ml-3 text-xl font-bold text-gray-900">RAG Explorer</span>
@@ -128,14 +128,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                   className={cn(
                     'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200',
                     isActive
-                      ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600'
+                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                   )}
                 >
                   <item.icon
                     className={cn(
                       'mr-3 h-5 w-5 flex-shrink-0 transition-colors duration-200',
-                      isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500'
+                      isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
                     )}
                   />
                   {item.name}

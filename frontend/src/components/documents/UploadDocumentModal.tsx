@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { X, Upload, FileText, Globe, AlertCircle, CheckCircle } from 'lucide-react'
+import { X, Upload, FileText, CheckCircle } from 'lucide-react'
 import { Card, CardHeader, CardBody, CardFooter } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -39,7 +39,6 @@ export const UploadDocumentModal: React.FC<UploadDocumentModalProps> = ({ open, 
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    watch,
   } = useForm<UploadDocumentFormData>({
     resolver: zodResolver(uploadDocumentSchema),
   })

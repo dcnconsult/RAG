@@ -8,7 +8,7 @@ export const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 

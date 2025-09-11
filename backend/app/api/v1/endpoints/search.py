@@ -106,8 +106,8 @@ async def hybrid_search(
 
 @router.get("/by-domain/{domain_id}")
 async def search_by_domain(
+    domain_id: UUID,
     query: str = Query(..., description="Search query text"),
-    domain_id: UUID = Query(..., description="Domain ID to search within"),
     limit: int = Query(10, ge=1, le=100, description="Maximum number of results"),
     db: AsyncSession = Depends(get_db)
 ) -> SearchResponse:

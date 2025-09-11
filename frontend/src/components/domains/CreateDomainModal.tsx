@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { X, Globe, FileText, MessageSquare, Settings } from 'lucide-react'
+import { X, Globe, Settings } from 'lucide-react'
 import { Card, CardHeader, CardBody, CardFooter } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -21,10 +21,10 @@ const createDomainSchema = z.object({
     .min(10, 'Description must be at least 10 characters')
     .max(500, 'Description must be less than 500 characters'),
   settings: z.object({
-    chunk_size: z.number().min(100).max(2000).default(1000),
-    chunk_overlap: z.number().min(0).max(500).default(200),
-    embedding_model: z.string().default('text-embedding-ada-002'),
-    max_tokens: z.number().min(100).max(4000).default(2000),
+    chunk_size: z.number().min(100).max(2000).optional(),
+    chunk_overlap: z.number().min(0).max(500).optional(),
+    embedding_model: z.string().optional(),
+    max_tokens: z.number().min(100).max(4000).optional(),
   }).optional(),
 })
 

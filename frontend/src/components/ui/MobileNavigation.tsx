@@ -9,7 +9,6 @@ import {
   MessageSquare, 
   Settings, 
   User,
-  Search,
   Plus,
   LogOut
 } from 'lucide-react'
@@ -43,7 +42,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ className })
   const [isScrolled, setIsScrolled] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
-  const { resolvedTheme } = useTheme()
+  useTheme()
 
   // Handle scroll effect
   useEffect(() => {
@@ -242,7 +241,6 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ className })
 // Bottom Navigation Bar for Mobile
 export const MobileBottomNav: React.FC = () => {
   const navigate = useNavigate()
-  const location = useLocation()
 
   const bottomNavItems = [
     { label: 'Home', path: routes.home, icon: Home },
@@ -282,7 +280,7 @@ export const MobileBottomNav: React.FC = () => {
 // Helper function to check if route is active
 const isActive = (path: string) => {
   if (path === routes.home) {
-    return location.pathname === path
+    return window.location.pathname === path
   }
-  return location.pathname.startsWith(path)
+  return window.location.pathname.startsWith(path)
 }

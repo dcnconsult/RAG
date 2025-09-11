@@ -13,7 +13,6 @@ import {
 } from 'lucide-react'
 import { Card, CardBody } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
 import { useToast, createToast } from '@/components/ui/Toast'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
@@ -38,7 +37,6 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
   className
 }) => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
-  const [isDragActiveState, setIsDragActiveState] = useState(false)
   const { addToast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -140,19 +138,6 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
     setUploadedFiles(prev => prev.filter(f => f.id !== fileId))
   }
 
-  const retryUpload = (fileId: string) => {
-    const file = uploadedFiles.find(f => f.id === fileId)
-    if (file) {
-      setUploadedFiles(prev => 
-        prev.map(f => 
-          f.id === fileId 
-            ? { ...f, status: 'uploading' as const, progress: 0, error: undefined }
-            : f
-        )
-      )
-      uploadFileFunction(file)
-    }
-  }
 
   const { getRootProps, getInputProps, isDragReject, isDragActive } = useDropzone({
     onDrop,

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 
 // Focus trap for modals and dropdowns
@@ -89,7 +88,7 @@ export const SkipToContent: React.FC<{ targetId?: string }> = ({ targetId = 'mai
   }, [])
 
   const handleClick = () => {
-    const targetElement = document.querySelector(`#${targetId}`)
+    const targetElement = document.querySelector(`#${targetId}`) as HTMLElement
     if (targetElement) {
       targetElement.focus()
       // Check if scrollIntoView is available (not available in jsdom)

@@ -10,7 +10,6 @@ import {
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { MobileNavigation } from '@/components/ui/MobileNavigation'
-import { cn } from '@/lib/utils'
 
 type HeaderProps = {
   onMenuClick?: () => void

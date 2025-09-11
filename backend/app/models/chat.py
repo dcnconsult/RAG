@@ -85,7 +85,7 @@ class ChatMessage(Base):
     content = Column(Text, nullable=False)
     
     # Metadata
-    metadata = Column(JSONB, nullable=True)
+    chat_metadata = Column(JSONB, nullable=True)
     
     # Relationships
     chat = relationship("Chat", back_populates="messages")

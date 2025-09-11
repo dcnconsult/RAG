@@ -2,7 +2,6 @@ import React from 'react'
 import { X, AlertTriangle, Trash2, Globe, FileText, MessageSquare } from 'lucide-react'
 import { Card, CardHeader, CardBody, CardFooter } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { cn } from '@/lib/utils'
 
 interface Domain {
   id: string

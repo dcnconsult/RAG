@@ -5,9 +5,10 @@ Application configuration settings
 import os
 from typing import List, Optional, Union
 from pydantic import BaseModel, Field, field_validator
+from pydantic_settings import BaseSettings
 
 
-class Settings(BaseModel):
+class Settings(BaseSettings):
     """Application settings"""
     
     # Application Configuration
@@ -150,10 +151,11 @@ class Settings(BaseModel):
             raise ValueError("MAX_FILE_SIZE must be at least 1MB")
         return v
     
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = True
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+        "case_sensitive": True,
+    }
 
 
 # Create settings instance

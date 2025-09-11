@@ -217,8 +217,7 @@ export const SkeletonForm: React.FC<{
   className?: string;
   fieldHeight?: string;
   spacing?: string;
-  fieldTypes?: string[];
-}> = ({ fields = 4, className, fieldHeight, spacing, fieldTypes }) => (
+}> = ({ fields = 4, className, fieldHeight, spacing }) => (
   <div data-testid="skeleton-form" className={cn(spacing || "space-y-6", className)}>
     {Array.from({ length: fields }).map((_, i) => (
       <div key={i} data-testid="skeleton-field" className={cn("space-y-2", fieldHeight)}>

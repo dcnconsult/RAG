@@ -36,7 +36,7 @@ export const BottomNavigation: React.FC = () => {
               <item.icon
                 className={cn(
                   'h-5 w-5 transition-colors duration-200',
-                  isActive ? 'text-yellow-600' : 'text-gray-400'
+                  isActive ? 'text-blue-500' : 'text-gray-400'
                 )}
               />
               <span className="text-xs font-medium">{item.name}</span>

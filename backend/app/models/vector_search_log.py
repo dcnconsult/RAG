@@ -19,7 +19,7 @@ class VectorSearchLog(Base):
     response_time = Column(Float, nullable=False)  # Response time in seconds
     
     # Metadata
-    metadata = Column(JSONB, nullable=True)  # Additional search parameters, filters, etc.
+    search_metadata = Column(JSONB, nullable=True)  # Additional search parameters, filters, etc.
     
     def __repr__(self) -> str:
         """String representation of the vector search log"""

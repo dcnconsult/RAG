@@ -3,7 +3,8 @@ Document and document chunk models
 """
 
 from sqlalchemy import Column, String, Text, BigInteger, ForeignKey, Integer
-from sqlalchemy.dialects.postgresql import JSONB, VECTOR
+from sqlalchemy.dialects.postgresql import JSONB
+from pgvector.sqlalchemy import Vector
 from sqlalchemy.orm import relationship
 
 from .base import Base
@@ -23,7 +24,7 @@ class Document(Base):
     status = Column(String(50), nullable=False, default="pending")  # pending, processing, completed, failed
     
     # Metadata
-    metadata = Column(JSONB, nullable=True)
+    document_metadata = Column(JSONB, nullable=True)
     
     # Relationships
     domain = relationship("Domain", back_populates="documents")
@@ -70,10 +71,10 @@ class DocumentChunk(Base):
     content = Column(Text, nullable=False)
     
     # Vector embedding
-    embedding = Column(VECTOR(1536), nullable=True)  # OpenAI ada-002 dimension
+    embedding = Column(Vector(1536), nullable=True)  # OpenAI ada-002 dimension
     
     # Metadata
-    metadata = Column(JSONB, nullable=True)
+    document_metadata = Column(JSONB, nullable=True)
     
     # Relationships
     document = relationship("Document", back_populates="chunks")

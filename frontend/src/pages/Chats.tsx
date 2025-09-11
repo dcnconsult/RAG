@@ -1,20 +1,9 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Badge } from '@/components/ui/Badge'
 import { 
-  Plus, 
-  Search, 
   MessageSquare, 
-  Globe, 
-  Clock, 
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-  Calendar,
   User,
   Brain,
   FileText,
@@ -22,7 +11,6 @@ import {
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { queryKeys, mutationKeys } from '@/lib/query-client'
-import { cn } from '@/lib/utils'
 import { CreateChatModal } from '@/components/chats/CreateChatModal'
 import { DeleteChatModal } from '@/components/chats/DeleteChatModal'
 
@@ -43,42 +31,21 @@ interface Chat {
   }
 }
 
-interface ChatFilters {
-  search: string
-  domain: string
-  status: string
-  sortBy: 'title' | 'created_at' | 'updated_at' | 'message_count'
-  sortOrder: 'asc' | 'desc'
-}
 
 export const Chats: React.FC = () => {
-  const [filters, setFilters] = useState<ChatFilters>({
-    search: '',
-    domain: '',
-    status: '',
-    sortBy: 'updated_at',
-    sortOrder: 'desc'
-  })
   
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deleteChat, setDeleteChat] = useState<Chat | null>(null)
-  const [selectedChats, setSelectedChats] = useState<Set<string>>(new Set())
   
   const queryClient = useQueryClient()
 
   // Fetch chats
-  const { data: chats = [], isLoading, error } = useQuery({
+  const { error } = useQuery({
     queryKey: queryKeys.chats,
     queryFn: () => api.get<Chat[]>('/chats'),
     staleTime: 30000, // 30 seconds
   })
 
-  // Fetch domains for filter
-  const { data: domains = [] } = useQuery({
-    queryKey: queryKeys.domains,
-    queryFn: () => api.get<any[]>('/domains'),
-    staleTime: 60000, // 1 minute
-  })
 
   // Delete chat mutation
   const deleteMutation = useMutation({
@@ -90,114 +57,8 @@ export const Chats: React.FC = () => {
     },
   })
 
-  // Bulk delete mutation
-  const bulkDeleteMutation = useMutation({
-    mutationFn: (chatIds: string[]) => 
-      Promise.all(chatIds.map(id => api.delete(`/chats/${id}`))),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.chats })
-      setSelectedChats(new Set())
-    },
-  })
 
-  // Filtered and sorted chats
-  const filteredChats = useMemo(() => {
-    let filtered = chats.filter(chat => {
-      const matchesSearch = chat.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                          (chat.last_message?.content && chat.last_message.content.toLowerCase().includes(filters.search.toLowerCase()))
-      const matchesDomain = !filters.domain || chat.domain_id === filters.domain
-      const matchesStatus = !filters.status || chat.status === filters.status
-      return matchesSearch && matchesDomain && matchesStatus
-    })
 
-    // Sorting
-    filtered.sort((a, b) => {
-      let aValue: any, bValue: any
-      
-      switch (filters.sortBy) {
-        case 'title':
-          aValue = a.title.toLowerCase()
-          bValue = b.title.toLowerCase()
-          break
-        case 'created_at':
-          aValue = new Date(a.created_at).getTime()
-          bValue = new Date(b.created_at).getTime()
-          break
-        case 'updated_at':
-          aValue = new Date(a.updated_at).getTime()
-          bValue = new Date(b.updated_at).getTime()
-          break
-        case 'message_count':
-          aValue = a.message_count
-          bValue = b.message_count
-          break
-        default:
-          aValue = a.title.toLowerCase()
-          bValue = b.title.toLowerCase()
-      }
-
-      if (filters.sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1
-      } else {
-        return aValue < bValue ? 1 : -1
-      }
-    })
-
-    return filtered
-  }, [chats, filters])
-
-  // Handle bulk selection
-  const handleSelectAll = () => {
-    if (selectedChats.size === filteredChats.length) {
-      setSelectedChats(new Set())
-    } else {
-      setSelectedChats(new Set(filteredChats.map(c => c.id)))
-    }
-  }
-
-  const handleSelectChat = (chatId: string) => {
-    const newSelected = new Set(selectedChats)
-    if (newSelected.has(chatId)) {
-      newSelected.delete(chatId)
-    } else {
-      newSelected.add(chatId)
-    }
-    setSelectedChats(newSelected)
-  }
-
-  // Handle bulk delete
-  const handleBulkDelete = () => {
-    if (selectedChats.size > 0) {
-      bulkDeleteMutation.mutate(Array.from(selectedChats))
-    }
-  }
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  // Get status badge variant
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'active': return 'success'
-      case 'archived': return 'secondary'
-      case 'deleted': return 'error'
-      default: return 'secondary'
-    }
-  }
-
-  // Truncate text
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text
-    return text.substring(0, maxLength) + '...'
-  }
 
   if (error) {
     return (
@@ -226,7 +87,7 @@ export const Chats: React.FC = () => {
       </div>
 
       {/* Chat Interface */}
-      <div className="flex flex-col h-[500px] sm:h-[600px] bg-white rounded-2xl border border-gray-200 shadow-soft">
+      <div className="card-modern flex flex-col h-[500px] sm:h-[600px]">
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 sm:space-y-4">
           {/* AI Assistant Message */}
@@ -248,8 +109,8 @@ export const Chats: React.FC = () => {
                 Hi! Can you tell me about the latest developments in AI?
               </p>
             </div>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
             </div>
           </div>
 
@@ -286,7 +147,7 @@ export const Chats: React.FC = () => {
             <Button
               variant="primary"
               size="sm"
-              className="bg-yellow-500 text-gray-900 hover:bg-yellow-600 h-7 w-7 sm:h-8 sm:w-8 p-0"
+              className="btn-primary h-7 w-7 sm:h-8 sm:w-8 p-0"
               title="Send Message"
             >
               <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />

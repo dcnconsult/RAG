@@ -37,7 +37,7 @@ def create_start_app_handler(app: FastAPI) -> Callable[[], Awaitable[None]]:
             
             # Initialize Celery
             logger.info("Initializing Celery...")
-            await init_celery()
+            init_celery()
             logger.info("Celery initialized")
             
             # Create uploads directory
@@ -64,7 +64,7 @@ def create_stop_app_handler(app: FastAPI) -> Callable[[], Awaitable[None]]:
         try:
             # Close Celery
             logger.info("Closing Celery...")
-            await close_celery()
+            close_celery()
             logger.info("Celery closed")
             
             # Close Redis

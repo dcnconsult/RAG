@@ -1,22 +1,15 @@
 import React, { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { Card, CardBody } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Badge } from '@/components/ui/Badge'
 import { 
   Plus, 
-  Search, 
-  Filter, 
   Globe, 
-  FileText, 
-  MessageSquare, 
-  MoreVertical,
-  Edit,
   Trash2,
+  Search,
   Eye,
-  Calendar,
-  Clock
+  Edit
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { queryKeys, mutationKeys } from '@/lib/query-client'
@@ -66,7 +59,7 @@ export const Domains: React.FC = () => {
 
   // Delete domain mutation
   const deleteMutation = useMutation({
-    mutationKey: mutationKeys.deleteDomain,
+    mutationKey: mutationKeys.deleteDomain(''),
     mutationFn: (domainId: string) => api.delete(`/domains/${domainId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.domains })
@@ -129,14 +122,6 @@ export const Domains: React.FC = () => {
     return filtered
   }, [domains, filters])
 
-  // Handle bulk selection
-  const handleSelectAll = () => {
-    if (selectedDomains.size === filteredDomains.length) {
-      setSelectedDomains(new Set())
-    } else {
-      setSelectedDomains(new Set(filteredDomains.map(d => d.id)))
-    }
-  }
 
   const handleSelectDomain = (domainId: string) => {
     const newSelected = new Set(selectedDomains)
@@ -164,15 +149,6 @@ export const Domains: React.FC = () => {
     })
   }
 
-  // Get status badge variant
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'active': return 'success'
-      case 'inactive': return 'secondary'
-      case 'processing': return 'warning'
-      default: return 'secondary'
-    }
-  }
 
   if (error) {
     return (
@@ -198,7 +174,7 @@ export const Domains: React.FC = () => {
               size="sm"
               onClick={() => setShowCreateModal(true)}
               leftIcon={<Plus className="h-4 w-4" />}
-              className="bg-yellow-500 text-gray-900 hover:bg-yellow-600"
+              className="btn-primary"
             >
               Add
             </Button>
@@ -220,7 +196,7 @@ export const Domains: React.FC = () => {
       </div>
 
       {/* Filters and Search */}
-      <Card>
+      <Card className="card-modern">
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-2">
@@ -236,7 +212,7 @@ export const Domains: React.FC = () => {
               <select
                 value={filters.status}
                 onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Status</option>
                 <option value="active">Active</option>
@@ -255,7 +231,7 @@ export const Domains: React.FC = () => {
                     sortOrder: sortOrder as any 
                   }))
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="created_at-desc">Newest First</option>
                 <option value="created_at-asc">Oldest First</option>
@@ -276,7 +252,7 @@ export const Domains: React.FC = () => {
         {isLoading ? (
           <div className="grid-mobile">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
+              <Card key={i} className="card-modern animate-pulse">
                 <CardBody className="p-4 sm:p-6">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-lg"></div>
@@ -303,20 +279,20 @@ export const Domains: React.FC = () => {
               <Card 
                 key={domain.id} 
                 className={cn(
-                  "hover:shadow-medium transition-all duration-200 cursor-pointer",
-                  selectedDomains.has(domain.id) && "ring-2 ring-yellow-500 bg-yellow-50"
+                  "card-modern cursor-pointer",
+                  selectedDomains.has(domain.id) && "ring-2 ring-blue-400 bg-blue-50"
                 )}
                 onClick={() => handleSelectDomain(domain.id)}
               >
                 <CardBody className="p-4 sm:p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3 flex-1">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                        <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-900 truncate">{domain.name}</h4>
-                        <p className="text-xs text-gray-500 mt-1">Last updated {formatDate(domain.updated_at)}</p>
+                        <h4 className="text-sm font-medium text-slate-900 truncate">{domain.name}</h4>
+                        <p className="text-xs text-slate-500 mt-1">Last updated {formatDate(domain.updated_at)}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-1">

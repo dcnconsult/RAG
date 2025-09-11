@@ -135,7 +135,7 @@ export class PerformanceMonitor {
     const functionMetrics = Object.fromEntries(
       Array.from(this.metrics.entries())
         .filter(([key]) => key.startsWith('function_'))
-        .map(([key, values]) => [key.replace('function_', ''), this.getAverageMetric(key)])
+        .map(([key]) => [key.replace('function_', ''), this.getAverageMetric(key)])
     )
 
     return {

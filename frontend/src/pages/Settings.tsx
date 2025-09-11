@@ -6,8 +6,6 @@ import { Input } from '@/components/ui/Input'
 import { 
   ArrowLeft,
   Key,
-  Palette,
-  Globe,
   ChevronRight
 } from 'lucide-react'
 
