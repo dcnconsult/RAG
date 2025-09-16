@@ -30,15 +30,23 @@ def create_start_app_handler(app: FastAPI) -> Callable[[], Awaitable[None]]:
             await init_db()
             logger.info("Database connection established")
             
-            # Initialize Redis
+            # Initialize Redis (optional)
             logger.info("Initializing Redis connection...")
-            await init_redis()
-            logger.info("Redis connection established")
+            try:
+                await init_redis()
+                logger.info("Redis connection established")
+            except Exception as e:
+                logger.warning(f"Redis connection failed (optional): {e}")
+                logger.info("Continuing without Redis...")
             
-            # Initialize Celery
+            # Initialize Celery (optional)
             logger.info("Initializing Celery...")
-            init_celery()
-            logger.info("Celery initialized")
+            try:
+                init_celery()
+                logger.info("Celery initialized")
+            except Exception as e:
+                logger.warning(f"Celery initialization failed (optional): {e}")
+                logger.info("Continuing without Celery...")
             
             # Create uploads directory
             import os

@@ -4,7 +4,7 @@ Application configuration settings
 
 import os
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field, field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -26,8 +26,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7, env="REFRESH_TOKEN_EXPIRE_DAYS")
     
     # Host Configuration
-    ALLOWED_HOSTS: List[str] = Field(default=["localhost", "127.0.0.1"], env="ALLOWED_HOSTS")
-    CORS_ORIGINS: List[str] = Field(default=["http://localhost:3000"], env="CORS_ORIGINS")
+    ALLOWED_HOSTS: str = Field(default="localhost,127.0.0.1", env="ALLOWED_HOSTS")
+    CORS_ORIGINS: str = Field(default="http://localhost:3000", env="CORS_ORIGINS")
     
     # Database Configuration
     DATABASE_URL: str = Field(..., env="DATABASE_URL")
@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     # File Upload Configuration
     MAX_FILE_SIZE: int = Field(default=10485760, env="MAX_FILE_SIZE")  # 10MB
     UPLOAD_DIR: str = Field(default="./uploads", env="UPLOAD_DIR")
-    ALLOWED_EXTENSIONS: List[str] = Field(default=["pdf", "docx", "txt", "md", "rtf"], env="ALLOWED_EXTENSIONS")
+    ALLOWED_EXTENSIONS: str = Field(default="pdf,docx,txt,md,rtf", env="ALLOWED_EXTENSIONS")
     
     # Rate Limiting
     RATE_LIMIT_PER_MINUTE: int = Field(default=60, env="RATE_LIMIT_PER_MINUTE")
@@ -85,8 +85,29 @@ class Settings(BaseSettings):
         """Check if running in testing mode"""
         return self.ENVIRONMENT.lower() == "testing"
     
+    @property
+    def allowed_hosts_list(self) -> List[str]:
+        """Get ALLOWED_HOSTS as a list"""
+        if isinstance(self.ALLOWED_HOSTS, str):
+            return [item.strip() for item in self.ALLOWED_HOSTS.split(",")]
+        return self.ALLOWED_HOSTS
+    
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Get CORS_ORIGINS as a list"""
+        if isinstance(self.CORS_ORIGINS, str):
+            return [item.strip() for item in self.CORS_ORIGINS.split(",")]
+        return self.CORS_ORIGINS
+    
+    @property
+    def allowed_extensions_list(self) -> List[str]:
+        """Get ALLOWED_EXTENSIONS as a list"""
+        if isinstance(self.ALLOWED_EXTENSIONS, str):
+            return [ext.strip().lower() for ext in self.ALLOWED_EXTENSIONS.split(",")]
+        return self.ALLOWED_EXTENSIONS
+    
     # Validators
-    @field_validator("ALLOWED_HOSTS", "CORS_ORIGINS", mode="before")
+    @field_validator("ALLOWED_HOSTS", "CORS_ORIGINS", mode="after")
     @classmethod
     def parse_list_fields(cls, v):
         """Parse list fields from environment variables"""
@@ -94,7 +115,7 @@ class Settings(BaseSettings):
             return [item.strip() for item in v.split(",")]
         return v
     
-    @field_validator("ALLOWED_EXTENSIONS", mode="before")
+    @field_validator("ALLOWED_EXTENSIONS", mode="after")
     @classmethod
     def parse_extensions(cls, v):
         """Parse file extensions from environment variables"""

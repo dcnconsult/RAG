@@ -44,6 +44,9 @@ async def init_db() -> None:
             pool_recycle=300,
             max_overflow=10,
             pool_size=20,
+            connect_args={
+                "ssl": False
+            }
         )
         
         # Create session factory

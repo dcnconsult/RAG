@@ -86,13 +86,13 @@ def init_celery() -> None:
         raise
 
 
-async def close_celery() -> None:
+def close_celery() -> None:
     """Close Celery application"""
     global _celery_app
     
     try:
         if _celery_app:
-            await _celery_app.close()
+            _celery_app.close()
             _celery_app = None
             logger.info("Celery application closed")
             
