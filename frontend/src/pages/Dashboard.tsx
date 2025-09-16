@@ -1,4 +1,19 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { routes } from '@/lib/routes'
+
+// Redirect to enhanced dashboard for showcase
+export const Dashboard: React.FC = () => {
+  const navigate = useNavigate()
+  
+  useEffect(() => {
+    navigate(routes.enhancedDashboard, { replace: true })
+  }, [navigate])
+  
+  return null
+}
+
+// Keep the original dashboard as a backup
 import { Card, CardHeader, CardBody, CardFooter } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -10,9 +25,8 @@ import {
   ArrowRight
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { routes } from '@/lib/routes'
 
-export const Dashboard: React.FC = () => {
+export const OriginalDashboard: React.FC = () => {
   const stats = [
     {
       name: 'Total Domains',
