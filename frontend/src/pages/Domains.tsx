@@ -51,14 +51,14 @@ export const Domains: React.FC = () => {
   const queryClient = useQueryClient()
 
   // Fetch domains
-  const { data: domains = [], isLoading, error } = useQuery({
+  const { data: domains = [], isLoading, error } = useQuery<Domain[]>({
     queryKey: queryKeys.domains,
     queryFn: () => api.get<Domain[]>('/domains'),
     staleTime: 30000, // 30 seconds
   })
 
   // Delete domain mutation
-  const deleteMutation = useMutation({
+  const deleteMutation = useMutation<void, unknown, string>({
     mutationKey: mutationKeys.deleteDomain(''),
     mutationFn: (domainId: string) => api.delete(`/domains/${domainId}`),
     onSuccess: () => {
@@ -68,9 +68,10 @@ export const Domains: React.FC = () => {
   })
 
   // Bulk delete mutation
-  const bulkDeleteMutation = useMutation({
-    mutationFn: (domainIds: string[]) => 
-      Promise.all(domainIds.map(id => api.delete(`/domains/${id}`))),
+  const bulkDeleteMutation = useMutation<void, unknown, string[]>({
+    mutationFn: async (domainIds: string[]) => {
+      await Promise.all(domainIds.map(id => api.delete(`/domains/${id}`)))
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.domains })
       setSelectedDomains(new Set())
@@ -88,35 +89,30 @@ export const Domains: React.FC = () => {
 
     // Sorting
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any
-      
-      switch (filters.sortBy) {
-        case 'name':
-          aValue = a.name.toLowerCase()
-          bValue = b.name.toLowerCase()
-          break
-        case 'created_at':
-          aValue = new Date(a.created_at).getTime()
-          bValue = new Date(b.created_at).getTime()
-          break
-        case 'document_count':
-          aValue = a.document_count
-          bValue = b.document_count
-          break
-        case 'chat_count':
-          aValue = a.chat_count
-          bValue = b.chat_count
-          break
-        default:
-          aValue = a.name.toLowerCase()
-          bValue = b.name.toLowerCase()
+      const [valueA, valueB] = (() => {
+        switch (filters.sortBy) {
+          case 'name':
+            return [a.name.toLowerCase(), b.name.toLowerCase()] as const
+          case 'created_at':
+            return [
+              new Date(a.created_at).getTime(),
+              new Date(b.created_at).getTime(),
+            ] as const
+          case 'document_count':
+            return [a.document_count, b.document_count] as const
+          case 'chat_count':
+            return [a.chat_count, b.chat_count] as const
+          default:
+            return [a.name.toLowerCase(), b.name.toLowerCase()] as const
+        }
+      })()
+
+      if (valueA === valueB) {
+        return 0
       }
 
-      if (filters.sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1
-      } else {
-        return aValue < bValue ? 1 : -1
-      }
+      const comparison = valueA > valueB ? 1 : -1
+      return filters.sortOrder === 'asc' ? comparison : -comparison
     })
 
     return filtered

@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/Button'
 import { useToast, createToast } from '@/components/ui/Toast'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { type AxiosProgressEvent } from 'axios'
 
 interface UploadedFile {
   id: string
@@ -78,24 +79,26 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-            setUploadedFiles(prev => 
-              prev.map(f => 
-                f.id === uploadFile.id 
-                  ? { ...f, progress }
-                  : f
-              )
-            )
+        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+          if (!progressEvent.total) {
+            return
           }
+
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          setUploadedFiles(prev =>
+            prev.map(f =>
+              f.id === uploadFile.id
+                ? { ...f, progress }
+                : f
+            )
+          )
         }
       })
 
       // Update file status to success
-      setUploadedFiles(prev => 
-        prev.map(f => 
-          f.id === uploadFile.id 
+      setUploadedFiles(prev =>
+        prev.map(f =>
+          f.id === uploadFile.id
             ? { ...f, status: 'success' as const, progress: 100 }
             : f
         )
@@ -112,15 +115,30 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
         `${uploadFile.file.name} has been uploaded successfully.`
       ))
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = (() => {
+        if (api.isAxiosError(error)) {
+          const detail = (error.response?.data as { detail?: unknown } | undefined)?.detail
+          if (typeof detail === 'string') {
+            return detail
+          }
+        }
+
+        if (error instanceof Error && error.message) {
+          return error.message
+        }
+
+        return 'Upload failed'
+      })()
+
       // Update file status to error
-      setUploadedFiles(prev => 
-        prev.map(f => 
-          f.id === uploadFile.id 
-            ? { 
-                ...f, 
-                status: 'error' as const, 
-                error: error.response?.data?.detail || 'Upload failed'
+      setUploadedFiles(prev =>
+        prev.map(f =>
+          f.id === uploadFile.id
+            ? {
+                ...f,
+                status: 'error' as const,
+                error: message
               }
             : f
         )
@@ -129,7 +147,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
       // Show error toast
       addToast(createToast.error(
         'Upload failed',
-        `${uploadFile.file.name}: ${error.response?.data?.detail || 'Upload failed'}`
+        `${uploadFile.file.name}: ${message}`
       ))
     }
   }

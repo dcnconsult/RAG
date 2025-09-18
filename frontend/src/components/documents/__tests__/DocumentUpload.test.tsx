@@ -30,7 +30,7 @@ describe('DocumentUpload', () => {
     ;(useToast as any).mockReturnValue({
       addToast: mockAddToast,
     })
-    ;(api.post as any).mockResolvedValue({ data: { id: '123', filename: 'test.pdf' } })
+    ;(api.post as any).mockResolvedValue({ id: '123', filename: 'test.pdf' })
   })
 
   afterEach(() => {
@@ -108,7 +108,7 @@ describe('DocumentUpload', () => {
     const mockFile = new File(['test content'], 'test.pdf', { type: 'application/pdf' })
     
     // Mock API success
-    vi.mocked(api.post).mockResolvedValue({ data: { id: '123', filename: 'test.pdf' } })
+    vi.mocked(api.post).mockResolvedValue({ id: '123', filename: 'test.pdf' })
     
     render(<DocumentUpload />)
     
@@ -138,7 +138,7 @@ describe('DocumentUpload', () => {
     // Mock API to fail first, then succeed
     vi.mocked(api.post)
       .mockRejectedValueOnce(new Error('Upload failed'))
-      .mockResolvedValueOnce({ data: { id: '123', filename: 'test.pdf' } })
+      .mockResolvedValueOnce({ id: '123', filename: 'test.pdf' })
     
     render(<DocumentUpload />)
     

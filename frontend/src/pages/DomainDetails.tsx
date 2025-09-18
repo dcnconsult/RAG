@@ -69,28 +69,28 @@ export const DomainDetails: React.FC = () => {
   const queryClient = useQueryClient()
 
   // Fetch domain details
-  const { data: domain, isLoading, error } = useQuery({
+  const { data: domain, isLoading, error } = useQuery<Domain>({
     queryKey: queryKeys.domain(id!),
     queryFn: () => api.get<Domain>(`/domains/${id}`),
     enabled: !!id,
   })
 
   // Fetch domain documents
-  const { data: documents = [] } = useQuery({
+  const { data: documents = [] } = useQuery<Document[]>({
     queryKey: ['domains', id, 'documents'],
     queryFn: () => api.get<Document[]>(`/domains/${id}/documents`),
     enabled: !!id,
   })
 
   // Fetch domain chats
-  const { data: chats = [] } = useQuery({
+  const { data: chats = [] } = useQuery<Chat[]>({
     queryKey: ['domains', id, 'chats'],
     queryFn: () => api.get<Chat[]>(`/domains/${id}/chats`),
     enabled: !!id,
   })
 
   // Delete domain mutation
-  const deleteMutation = useMutation({
+  const deleteMutation = useMutation<void, unknown>({
     mutationKey: mutationKeys.deleteDomain(id!),
     mutationFn: () => api.delete(`/domains/${id}`),
     onSuccess: () => {

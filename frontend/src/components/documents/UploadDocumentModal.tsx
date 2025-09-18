@@ -23,6 +23,15 @@ const uploadDocumentSchema = z.object({
 
 type UploadDocumentFormData = z.infer<typeof uploadDocumentSchema>
 
+interface Domain {
+  id: string
+  name: string
+}
+
+interface UploadDocumentResponse {
+  id: string
+}
+
 interface UploadDocumentModalProps {
   open: boolean
   onClose: () => void
@@ -44,13 +53,13 @@ export const UploadDocumentModal: React.FC<UploadDocumentModalProps> = ({ open, 
   })
 
   // Fetch domains
-  const { data: domains = [] } = useQuery({
+  const { data: domains = [] } = useQuery<Domain[]>({
     queryKey: queryKeys.domains,
-    queryFn: () => api.get<any[]>('/domains'),
+    queryFn: () => api.get<Domain[]>('/domains'),
   })
 
   // Upload document mutation
-  const uploadMutation = useMutation({
+  const uploadMutation = useMutation<UploadDocumentResponse, unknown, { file: File; formData: UploadDocumentFormData }>({
     mutationKey: mutationKeys.uploadDocument,
     mutationFn: async (data: { file: File; formData: UploadDocumentFormData }) => {
       const formData = new FormData()
@@ -66,14 +75,23 @@ export const UploadDocumentModal: React.FC<UploadDocumentModalProps> = ({ open, 
         formData.append('metadata[description]', data.formData.metadata.description)
       }
 
-      return api.upload('/documents/upload', data.file, (progress) => {
-        setUploadProgress(prev => ({ ...prev, [data.file.name]: progress }))
-      })
+      return api.upload<UploadDocumentResponse>(
+        '/documents/upload',
+        formData,
+        (progress: number) => {
+          setUploadProgress(prev => ({ ...prev, [data.file.name]: progress }))
+        }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.documents })
       reset()
       onClose()
+    },
+    onError: (error) => {
+      if (api.isAxiosError(error)) {
+        console.error('Document upload failed:', error.message)
+      }
     },
   })
 
