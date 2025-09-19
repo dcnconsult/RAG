@@ -42,14 +42,14 @@ export const Documents: React.FC = () => {
   const queryClient = useQueryClient()
 
   // Fetch documents
-  const { data: documents = [], isLoading, error } = useQuery({
+  const { data: documents = [], isLoading, error } = useQuery<Document[]>({
     queryKey: queryKeys.documents,
     queryFn: () => api.get<Document[]>('/documents'),
     staleTime: 30000, // 30 seconds
   })
 
   // Delete document mutation
-  const deleteMutation = useMutation({
+  const deleteMutation = useMutation<void, unknown, string>({
     mutationKey: mutationKeys.deleteDocument(''),
     mutationFn: (documentId: string) => api.delete(`/documents/${documentId}`),
     onSuccess: () => {

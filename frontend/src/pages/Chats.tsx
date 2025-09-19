@@ -40,7 +40,7 @@ export const Chats: React.FC = () => {
   const queryClient = useQueryClient()
 
   // Fetch chats
-  const { error } = useQuery({
+  const { error } = useQuery<Chat[]>({
     queryKey: queryKeys.chats,
     queryFn: () => api.get<Chat[]>('/chats'),
     staleTime: 30000, // 30 seconds
@@ -48,7 +48,7 @@ export const Chats: React.FC = () => {
 
 
   // Delete chat mutation
-  const deleteMutation = useMutation({
+  const deleteMutation = useMutation<void, unknown, string>({
     mutationKey: mutationKeys.deleteChat(''),
     mutationFn: (chatId: string) => api.delete(`/chats/${chatId}`),
     onSuccess: () => {
