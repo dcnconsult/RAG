@@ -2,19 +2,20 @@ import React from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { routes } from '@/lib/routes'
-import { 
-  Home, 
-  Globe, 
-  FileText, 
-  MessageSquare, 
-  Search, 
-  Brain, 
-  Database, 
-  BarChart3, 
-  Users, 
-  Shield, 
-  Settings, 
-  X 
+import {
+  Home,
+  Globe,
+  FileText,
+  MessageSquare,
+  Search,
+  Brain,
+  Database,
+  BarChart3,
+  Users,
+  Shield,
+  Settings,
+  Sparkles,
+  X
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -39,116 +40,138 @@ const navigation = [
 export const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
   const location = useLocation()
 
+  const renderNavigation = (onNavigate?: () => void) =>
+    navigation.map((item) => {
+      const isActive = location.pathname === item.href ||
+        (item.href !== routes.dashboard && location.pathname.startsWith(item.href))
+
+      return (
+        <NavLink
+          key={item.name}
+          to={item.href}
+          onClick={() => onNavigate?.()}
+          className={cn(
+            'group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200',
+            isActive
+              ? 'bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-500 text-white shadow-lg shadow-blue-500/30'
+              : 'text-slate-500 hover:text-slate-900 hover:bg-white/70 hover:shadow-sm'
+          )}
+        >
+          <item.icon
+            className={cn(
+              'h-5 w-5 transition-colors duration-200',
+              isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-500'
+            )}
+          />
+          <span>{item.name}</span>
+        </NavLink>
+      )
+    })
+
   return (
     <>
       {/* Mobile sidebar */}
-      <div className={cn(
-        'fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden',
-        open ? 'translate-x-0' : '-translate-x-full'
-      )}>
-        <div className="flex h-full flex-col">
-          {/* Logo and close button */}
-          <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200">
-            <div className="flex items-center">
-              <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <Brain className="h-5 w-5 text-white" />
+      <div
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 w-72 transform px-4 transition-transform duration-300 ease-in-out lg:hidden',
+          open ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <div className="flex h-full flex-col rounded-3xl border border-white/50 bg-white/90 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-lg">
+                <Brain className="h-5 w-5" />
               </div>
-              <span className="ml-3 text-xl font-bold text-gray-900">RAG Explorer</span>
+              <div>
+                <span className="text-lg font-semibold text-slate-900">RAG Explorer</span>
+                <p className="text-xs font-medium uppercase tracking-wide text-blue-500/80">Control Center</p>
+              </div>
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-slate-200/70 bg-white/80 text-slate-500 transition-colors hover:border-blue-200 hover:text-blue-600"
+              aria-label="Close navigation"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-3 py-4">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href || 
-                (item.href !== routes.dashboard && location.pathname.startsWith(item.href))
-              
-              return (
-                <NavLink
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200',
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      'mr-3 h-5 w-5 flex-shrink-0 transition-colors duration-200',
-                      isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
-                    )}
-                  />
-                  {item.name}
-                </NavLink>
-              )
-            })}
+          <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+            Navigation
+          </div>
+
+          <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
+            {renderNavigation(() => setOpen(false))}
           </nav>
 
-          {/* Footer */}
-          <div className="border-t border-gray-200 p-4">
-            <div className="text-xs text-gray-500 text-center">
-              RAG Explorer v1.0.0
+          <div className="mt-6 rounded-2xl border border-blue-100/70 bg-blue-50/80 p-4 text-sm text-slate-600 shadow-inner">
+            <div className="flex items-center gap-2 text-blue-700">
+              <Sparkles className="h-4 w-4" />
+              <span className="font-semibold">Workspace Health</span>
             </div>
+            <p className="mt-2 text-xs text-slate-500">
+              Storage usage at 68%. Keep performance optimal by maintaining healthy domains.
+            </p>
+            <div className="mt-3 h-2 rounded-full bg-white/70">
+              <div className="h-2 w-[68%] rounded-full bg-gradient-to-r from-blue-500 to-indigo-500" />
+            </div>
+          </div>
+
+          <div className="mt-6 text-center text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+            RAG Explorer v2.1
           </div>
         </div>
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white shadow-xl border-r border-gray-200">
-          {/* Logo */}
-          <div className="flex h-16 items-center px-6 border-b border-gray-200">
-            <div className="flex items-center">
-              <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <Brain className="h-5 w-5 text-white" />
-              </div>
-              <span className="ml-3 text-xl font-bold text-gray-900">RAG Explorer</span>
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col lg:px-6 lg:py-8">
+        <div className="flex h-full flex-col rounded-3xl border border-white/50 bg-white/80 p-6 shadow-[0_24px_45px_-25px_rgba(15,23,42,0.4)] backdrop-blur-2xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-500 text-white shadow-lg">
+              <Brain className="h-5 w-5" />
+            </div>
+            <div>
+              <span className="text-xl font-semibold text-slate-900">RAG Explorer</span>
+              <p className="text-xs font-medium uppercase tracking-[0.3em] text-blue-500/80">Knowledge Studio</p>
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-3 py-4">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href || 
-                (item.href !== routes.dashboard && location.pathname.startsWith(item.href))
-              
-              return (
-                <NavLink
-                  key={item.name}
-                  to={item.href}
-                  className={cn(
-                    'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200',
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      'mr-3 h-5 w-5 flex-shrink-0 transition-colors duration-200',
-                      isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
-                    )}
-                  />
-                  {item.name}
-                </NavLink>
-              )
-            })}
+          <div className="mt-8 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+            Navigation
+          </div>
+
+          <nav className="mt-4 flex-1 space-y-2 pr-2">
+            {renderNavigation()}
           </nav>
 
-          {/* Footer */}
-          <div className="border-t border-gray-200 p-4">
-            <div className="text-xs text-gray-500 text-center">
-              RAG Explorer v1.0.0
+          <div className="mt-6 rounded-2xl border border-blue-100/60 bg-blue-50/70 p-5 text-sm text-slate-600">
+            <div className="flex items-center gap-2 text-blue-700">
+              <Sparkles className="h-4 w-4" />
+              <span className="font-semibold">Workspace Insights</span>
             </div>
+            <p className="mt-2 text-xs leading-relaxed text-slate-500">
+              You are operating in enterprise mode. Monitor ingestion and chat adoption from the dashboard.
+            </p>
+            <div className="mt-4 space-y-3">
+              <div>
+                <div className="flex items-center justify-between text-[11px] font-medium text-slate-500">
+                  <span>Storage Utilization</span>
+                  <span>68%</span>
+                </div>
+                <div className="mt-2 h-2 rounded-full bg-white/70">
+                  <div className="h-2 w-[68%] rounded-full bg-gradient-to-r from-blue-500 to-indigo-500" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] text-blue-600">
+                <Sparkles className="h-4 w-4" />
+                <span>Pro tip: Archive inactive domains quarterly.</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+            RAG Explorer v2.1
           </div>
         </div>
       </div>
